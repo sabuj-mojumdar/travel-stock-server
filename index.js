@@ -118,7 +118,54 @@ async function run() {
             const result = await guideCollection.updateOne(filter, updateInfo);
             res.send(result);
         });
+        /*================Booking api ==================*/
+        const bookingCollection = database.collection("booking");
+        //add a booking
+        app.post("/bookings", async (req, res) => {
+            const result = await bookingCollection.insertOne(req.body);
+            res.json(result);
+        })
+        //get all booking
+        app.get("/bookings", async (req, res) => {
+            const cursor = bookingCollection.find({});
+            const book = await cursor.toArray();
+            res.send(book);
+        })
+        //get single booking
+        app.get("/bookings/:bid", async (req, res) => {
+            const id = req.params.bid;
+            const query = { _id: ObjectId(id) };
+            const book = await bookingCollection.findOne(query);
+            res.json(book);
+        })
 
+        //delete single booking
+        app.delete('/bookings/:bid', async (req, res) => {
+            const id = req.params.bid;
+            const query = { _id: ObjectId(id) };
+            const result = await bookingCollection.deleteOne(query);
+            res.json(result);
+        })
+        //update signle booking
+        app.put("/update-book/:bid", async (req, res) => {
+            const id = req.params.bid;
+            const updatedBook = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updateInfo = {
+                $set: {
+                    checkIn: updatedBook.checkIn,
+                    checkOut: updatedBook.checkOut,
+                    adult: updatedBook.adult,
+                    child: updatedBook.child,
+                    room: updatedBook.room,
+                    night: updatedBook.night,
+                    order: updatedBook.order,
+                    guide: updatedBook.guide,
+                },
+            };
+            const result = await bookingCollection.updateOne(filter, updateInfo);
+            res.send(result);
+        });
 
 
     } finally {
